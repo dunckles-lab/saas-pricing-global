@@ -105,30 +105,52 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         transition: background-color 0.3s ease, color 0.3s ease;
       }
 
+      /* Global Link Styling & Visited Reset */
+      a, a:visited {
+        color: inherit;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+      a:hover {
+        color: var(--primary);
+      }
+
       h1, h2, h3, h4, strong {
         color: var(--text-primary);
       }
+      h1 a, h2 a, h3 a, h4 a,
+      h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited {
+        color: var(--text-primary) !important;
+      }
+      h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover {
+        color: var(--primary) !important;
+      }
 
-      .btn-primary {
+      .btn, .btn:visited, .btn-primary, .btn-primary:visited {
+        text-decoration: none;
+      }
+
+      .btn-primary, .btn-primary:visited {
         background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
         color: #ffffff !important;
       }
 
-      .btn-ghost {
+      .btn-ghost, .btn-ghost:visited {
         background: var(--card-bg-subtle);
         border: 1px solid var(--border-glass);
-        color: var(--text-primary);
+        color: var(--text-primary) !important;
       }
       .btn-ghost:hover {
         background: var(--primary-glow);
         border-color: var(--primary);
-        color: var(--primary);
+        color: var(--primary) !important;
       }
 
       .table-row-item td {
         padding: 14px 16px;
       }
-      .table-row-item a {
+      .table-row-item a,
+      .table-row-item a:visited {
         color: var(--text-primary) !important;
       }
       .table-row-item a:hover {
@@ -183,7 +205,7 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         box-shadow: 0 0 16px var(--primary-glow);
       }
       .nav-links { display: flex; align-items: center; gap: 24px; font-size: 0.92rem; font-weight: 600; }
-      .nav-links a { color: var(--text-muted); }
+      .nav-links a, .nav-links a:visited { color: var(--text-muted); }
       .nav-links a:hover { color: var(--primary); }
 
       /* Interactive Glass Card */
