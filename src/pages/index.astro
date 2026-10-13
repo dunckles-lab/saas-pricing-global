@@ -16,50 +16,87 @@ const websiteSchema = {
 ---
 
 <Layout title={title} description={description} canonicalPath="/" jsonLd={[websiteSchema]}>
-  <div style="margin-bottom: 32px;">
-    <h1 style="font-size: 2.2rem; font-weight: 800; color: #f8fafc; margin-bottom: 12px;">Global SaaS & Software Pricing Matrix</h1>
-    <p style="color: #94a3b8; font-size: 1.1rem; max-width: 780px;">
-      Discover how digital subscription prices vary across the world. Software companies adjust rates according to local purchasing power, creating massive price differences.
+  <!-- Hero Section -->
+  <div style="margin-bottom: 36px; text-align: center; max-width: 820px; margin-left: auto; margin-right: auto;">
+    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); padding: 6px 14px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; color: #38bdf8; margin-bottom: 16px;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+      Live FX Indexed • 2026 PPP Matrix
+    </div>
+    <h1 style="font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; line-height: 1.15; color: #ffffff; margin-bottom: 16px;">
+      Track & Compare Software Pricing <span style="background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Worldwide</span>
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.12rem; line-height: 1.6;">
+      Big tech charges radically different prices depending on where you live. Explore official localized subscription fees, calculate savings, and identify billing requirements.
     </p>
+
+    <!-- Interactive Client Search & Filter -->
+    <div class="filter-bar" style="margin-top: 32px; justify-content: center;">
+      <input 
+        type="text" 
+        id="saasSearch" 
+        class="search-input" 
+        placeholder="🔍 Type software name (e.g. ChatGPT, Spotify, Netflix, Copilot)..." 
+        autocomplete="off"
+      />
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;" id="categoryFilters">
+        <button class="btn btn-ghost filter-btn active" data-cat="all" style="border-radius: 9999px; padding: 8px 16px; font-size: 0.82rem;">All Categories</button>
+        <button class="btn btn-ghost filter-btn" data-cat="AI & Dev" style="border-radius: 9999px; padding: 8px 16px; font-size: 0.82rem;">AI & Dev</button>
+        <button class="btn btn-ghost filter-btn" data-cat="Streaming" style="border-radius: 9999px; padding: 8px 16px; font-size: 0.82rem;">Streaming</button>
+        <button class="btn btn-ghost filter-btn" data-cat="Design & Creative" style="border-radius: 9999px; padding: 8px 16px; font-size: 0.82rem;">Design</button>
+        <button class="btn btn-ghost filter-btn" data-cat="Productivity" style="border-radius: 9999px; padding: 8px 16px; font-size: 0.82rem;">Productivity</button>
+      </div>
+    </div>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px;">
+  <!-- Products Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 24px;" id="productsGrid">
     {SAAS_PRODUCTS.map((prod) => {
       const primaryPlan = prod.plans[0];
       const normalized = calculateNormalizedPrices(primaryPlan);
       const cheapest = normalized[0];
       const expensive = normalized[normalized.length - 1];
+      const savings = Math.abs(cheapest.differenceVsUSPercent);
 
       return (
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="glass-card hoverable product-card" data-name={prod.name.toLowerCase()} data-cat={prod.category} style="display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-              <span class="badge-tag">{prod.category}</span>
-              <span style="font-size: 0.8rem; color: #38bdf8;">{prod.vpnFriendly ? '✓ International Cards' : '⚠ Local Payment Strict'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <span class="badge badge-category">{prod.category}</span>
+              <span class="badge badge-cheapest">Up to {savings}% OFF</span>
             </div>
-            <h2 style="font-size: 1.4rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">
-              <a href={`/${prod.id}/pricing`}>{prod.name}</a>
+            <h2 style="font-size: 1.45rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">
+              <a href={`/${prod.id}/pricing`} style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{prod.name}</span>
+                <span style="font-size: 1.1rem; color: #64748b;">→</span>
+              </a>
             </h2>
-            <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 16px;">
+            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 18px;">
               {prod.description}
             </p>
           </div>
 
-          <div style="border-top: 1px solid #1e293b; padding-top: 14px; font-size: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span style="color: #64748b;">Cheapest ({cheapest.country.name}):</span>
-              <span style="color: #34d399; font-weight: 700;">${cheapest.usdPrice.toFixed(2)}/mo</span>
+          <div style="border-top: 1px solid var(--border-glass); padding-top: 16px;">
+            <div style="background: rgba(6, 9, 19, 0.6); padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.82rem; color: var(--text-dim);">Lowest in World:</span>
+                <span class="mono" style="font-size: 0.95rem; font-weight: 700; color: #34d399;">
+                  {cheapest.country.flag} ${cheapest.usdPrice.toFixed(2)}/mo
+                </span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.82rem; color: var(--text-dim);">US Baseline:</span>
+                <span class="mono" style="font-size: 0.88rem; color: #f8fafc; font-weight: 600;">
+                  🇺🇸 ${expensive.usdPrice.toFixed(2)}/mo
+                </span>
+              </div>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <span style="color: #64748b;">Most Expensive ({expensive.country.name}):</span>
-              <span style="color: #f472b6; font-weight: 700;">${expensive.usdPrice.toFixed(2)}/mo</span>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <a href={`/${prod.id}/pricing`} style="flex: 1; text-align: center; background: #2563eb; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
-                Full Country Table →
+
+            <div style="display: flex; gap: 10px;">
+              <a href={`/${prod.id}/pricing`} class="btn btn-primary" style="flex: 1; font-size: 0.85rem;">
+                Explore All {normalized.length} Countries
               </a>
-              <a href={`/cheapest-country-to-buy-${prod.id}`} style="background: #1e293b; color: #94a3b8; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;">
-                Cheapest Guide
+              <a href={`/cheapest-country-to-buy-${prod.id}`} class="btn btn-ghost" title="View Rankings" style="font-size: 0.85rem; padding: 10px 12px;">
+                🏆
               </a>
             </div>
           </div>
@@ -67,4 +104,38 @@ const websiteSchema = {
       );
     })}
   </div>
+
+  <script is:inline>
+    const searchInput = document.getElementById('saasSearch');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const productCards = document.querySelectorAll('.product-card');
+    let currentCategory = 'all';
+
+    function applyFilter() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      productCards.forEach((card) => {
+        const name = card.dataset.name || '';
+        const cat = card.dataset.cat || '';
+        const matchesSearch = name.includes(query);
+        const matchesCategory = currentCategory === 'all' || cat === currentCategory;
+
+        if (matchesSearch && matchesCategory) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.cat;
+        applyFilter();
+      });
+    });
+  </script>
 </Layout>
