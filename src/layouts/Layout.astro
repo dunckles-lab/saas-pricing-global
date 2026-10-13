@@ -271,6 +271,7 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         overflow-x: auto;
         border-radius: 12px;
         border: 1px solid var(--border-glass);
+        background: var(--bg-surface);
       }
       table.data-table {
         width: 100%;
@@ -279,9 +280,9 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         font-size: 0.92rem;
       }
       table.data-table th {
-        background: #090f1d;
+        background: var(--card-bg-subtle) !important;
         padding: 14px 18px;
-        color: var(--text-dim);
+        color: var(--text-dim) !important;
         font-weight: 700;
         font-size: 0.78rem;
         text-transform: uppercase;
@@ -291,11 +292,12 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
       table.data-table td {
         padding: 14px 18px;
         border-bottom: 1px solid var(--border-glass);
-        background: rgba(14, 21, 38, 0.6);
+        background: var(--bg-surface) !important;
+        color: var(--text-primary) !important;
         transition: background 0.15s ease;
       }
       table.data-table tr:hover td {
-        background: rgba(56, 189, 248, 0.04);
+        background: var(--table-row-hover) !important;
       }
       table.data-table tr:last-child td {
         border-bottom: none;
