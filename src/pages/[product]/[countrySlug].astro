@@ -130,12 +130,22 @@ const productSchema = {
         <label style="display: block; font-size: 0.82rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; text-transform: uppercase;">
           Subscription Duration:
         </label>
-        <select id="monthsSelect" style="background: #090f1d; border: 1px solid var(--border-glass); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 0.95rem; outline: none;">
-          <option value="1">1 Month</option>
-          <option value="3">3 Months (Quarterly)</option>
-          <option value="6">6 Months (Biannual)</option>
-          <option value="12" selected>12 Months (1 Year)</option>
-        </select>
+        
+        <!-- Styled Custom Selectbox (Non-native) -->
+        <div class="custom-select-wrapper" id="customMonthsWrapper">
+          <div class="custom-select-trigger" id="customMonthsTrigger">
+            <span id="customMonthsLabel">12 Months (1 Year)</span>
+            <span style="font-size: 0.75rem; color: var(--primary);">▼</span>
+          </div>
+          <div class="custom-select-options">
+            <div class="custom-option" data-value="1">1 Month</div>
+            <div class="custom-option" data-value="3">3 Months (Quarterly)</div>
+            <div class="custom-option" data-value="6">6 Months (Biannual)</div>
+            <div class="custom-option selected" data-value="12">12 Months (1 Year)</div>
+          </div>
+        </div>
+        <!-- Hidden input for state preservation -->
+        <input type="hidden" id="monthsSelect" value="12" />
       </div>
 
       <div style="flex: 1; min-width: 260px; background: rgba(6, 9, 19, 0.6); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-glass);">
@@ -201,20 +211,46 @@ const productSchema = {
   </div>
 
   <script is:inline define:vars={{ localPrice, usdPrice, currency: country.currency }}>
-    const select = document.getElementById('monthsSelect');
+    const hiddenInput = document.getElementById('monthsSelect');
+    const customWrapper = document.getElementById('customMonthsWrapper');
+    const customTrigger = document.getElementById('customMonthsTrigger');
+    const customLabel = document.getElementById('customMonthsLabel');
+    const customOptions = document.querySelectorAll('.custom-option');
     const localTotalEl = document.getElementById('calcLocalTotal');
     const usdTotalEl = document.getElementById('calcUsdTotal');
 
-    function updateCalc() {
-      const months = parseInt(select.value, 10) || 1;
+    function updateCalc(months) {
       const totalLocal = localPrice * months;
       const totalUsd = usdPrice * months;
 
-      localTotalEl.textContent = `${currency} ${totalLocal.toLocaleString()}`;
-      usdTotalEl.textContent = `$${totalUsd.toFixed(2)} USD`;
+      if (localTotalEl) localTotalEl.textContent = `${currency} ${totalLocal.toLocaleString()}`;
+      if (usdTotalEl) usdTotalEl.textContent = `$${totalUsd.toFixed(2)} USD`;
     }
 
-    select.addEventListener('change', updateCalc);
-    updateCalc();
+    if (customTrigger && customWrapper) {
+      customTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customWrapper.classList.toggle('open');
+      });
+
+      document.addEventListener('click', () => {
+        customWrapper.classList.remove('open');
+      });
+
+      customOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+          customOptions.forEach((opt) => opt.classList.remove('selected'));
+          option.classList.add('selected');
+          const val = parseInt(option.dataset.value, 10);
+          if (customLabel) customLabel.textContent = option.textContent;
+          if (hiddenInput) hiddenInput.value = val;
+          updateCalc(val);
+          customWrapper.classList.remove('open');
+        });
+      });
+    }
+
+    // Initialize with 12 months default
+    updateCalc(12);
   </script>
 </Layout>
