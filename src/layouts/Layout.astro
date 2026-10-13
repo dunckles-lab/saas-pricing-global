@@ -4,15 +4,19 @@ interface Props {
   description: string;
   canonicalPath?: string;
   jsonLd?: object[];
+  lang?: LangCode;
 }
 
-const { title, description, canonicalPath = '', jsonLd = [] } = Astro.props;
+import { SUPPORTED_LANGUAGES, type LangCode, getLocalizedPath } from '../i18n/translations';
+
+const { title, description, canonicalPath = '', jsonLd = [], lang = 'en' } = Astro.props;
 const siteUrl = 'https://saas-pricing-global.pages.dev';
-const canonicalUrl = `${siteUrl}${canonicalPath}`;
+const localizedPath = getLocalizedPath(canonicalPath, lang);
+const canonicalUrl = `${siteUrl}${localizedPath}`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,6 +32,13 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
     </script>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Multilingual Hreflang Tags for International SEO -->
+    {SUPPORTED_LANGUAGES.map((l) => (
+      <link rel="alternate" hreflang={l.code} href={`${siteUrl}${getLocalizedPath(canonicalPath, l.code)}`} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}${canonicalPath}`} />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -484,10 +495,31 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
           <span>SaaS<span class="gradient">Price</span>Global</span>
         </a>
         <div class="nav-links">
-          <a href="/">All Software</a>
-          <a href="/guide">PPP Guide</a>
-          <a href="/cheapest-country-to-buy-chatgpt-plus">ChatGPT Index</a>
-          <a href="/cheapest-country-to-buy-spotify-premium">Spotify Index</a>
+          <a href={getLocalizedPath('/', lang)}>All Software</a>
+          <a href={getLocalizedPath('/guide', lang)}>PPP Guide</a>
+          <a href={getLocalizedPath('/cheapest-country-to-buy-chatgpt-plus', lang)}>ChatGPT Index</a>
+          <a href={getLocalizedPath('/cheapest-country-to-buy-spotify-premium', lang)}>Spotify Index</a>
+
+          <!-- Language Switcher Custom Dropdown -->
+          <div class="custom-select-wrapper" id="langSwitcherWrapper" style="min-width: 110px;">
+            <div class="custom-select-trigger" id="langSwitcherTrigger" style="padding: 7px 12px; font-size: 0.82rem; border-radius: 10px;">
+              <span>{SUPPORTED_LANGUAGES.find(l => l.code === lang)?.flag} {lang.toUpperCase()}</span>
+              <span style="font-size: 0.65rem; color: var(--primary);">▼</span>
+            </div>
+            <div class="custom-select-options" style="min-width: 140px; right: 0; left: auto;">
+              {SUPPORTED_LANGUAGES.map((l) => (
+                <a
+                  href={getLocalizedPath(canonicalPath, l.code)}
+                  class={`custom-option ${l.code === lang ? 'selected' : ''}`}
+                  style="text-decoration: none; padding: 8px 12px; font-size: 0.85rem;"
+                >
+                  <span>{l.flag}</span>
+                  <span>{l.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
           <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
             🌙
           </button>
@@ -534,6 +566,19 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         toggleBtn.addEventListener('click', () => {
           const isLight = document.documentElement.getAttribute('data-theme') === 'light';
           setTheme(isLight ? 'dark' : 'light');
+        });
+      }
+
+      // Language Switcher Dropdown Click Outside
+      const langWrapper = document.getElementById('langSwitcherWrapper');
+      const langTrigger = document.getElementById('langSwitcherTrigger');
+      if (langTrigger && langWrapper) {
+        langTrigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          langWrapper.classList.toggle('open');
+        });
+        document.addEventListener('click', () => {
+          langWrapper.classList.remove('open');
         });
       }
     </script>

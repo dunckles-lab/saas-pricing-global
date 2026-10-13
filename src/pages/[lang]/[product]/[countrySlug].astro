@@ -1,0 +1,250 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { SAAS_PRODUCTS, type SaaSProduct } from '../../../data/products';
+import { COUNTRIES, type CountryInfo } from '../../../data/countries';
+import { calculateNormalizedPrices, formatCurrencyLocal } from '../../../utils/pricing';
+import { SUPPORTED_LANGUAGES, type LangCode, t, getLocalizedPath } from '../../../i18n/translations';
+
+export function getStaticPaths() {
+  const nonDefaultLangs = SUPPORTED_LANGUAGES.filter((l) => !l.isDefault);
+  const paths = [];
+
+  for (const lang of nonDefaultLangs) {
+    for (const product of SAAS_PRODUCTS) {
+      for (const country of Object.values(COUNTRIES)) {
+        const countrySlug = country.name.toLowerCase().replace(/\s+/g, '-');
+        paths.push({
+          params: {
+            lang: lang.code,
+            product: product.id,
+            countrySlug: `price-in-${countrySlug}`,
+          },
+          props: { product, country, lang: lang.code as LangCode },
+        });
+      }
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  product: SaaSProduct;
+  country: CountryInfo;
+  lang: LangCode;
+}
+
+const { product, country, lang } = Astro.props;
+const primaryPlan = product.plans[0];
+const localPrice = primaryPlan.prices[country.code];
+const usdPrice = localPrice / country.fxRateToUsd;
+
+const normalized = calculateNormalizedPrices(primaryPlan);
+const usItem = normalized.find((i) => i.country.code === 'us') || normalized[0];
+const diffVsUS = usdPrice - usItem.usdPrice;
+const diffPercent = Math.round((diffVsUS / usItem.usdPrice) * 100);
+const savingsAnnual = Math.abs(diffVsUS) * 12;
+
+const rank = normalized.findIndex((i) => i.country.code === country.code) + 1;
+
+const title = `${t(lang, 'howMuchIn', { product: product.name, country: country.name })} (2026)`;
+const description = `Subscription price for ${product.name} in ${country.name} (${country.currency}): ${formatCurrencyLocal(localPrice, country.currency)}.`;
+const countrySlug = country.name.toLowerCase().replace(/\s+/g, '-');
+---
+
+<Layout title={title} description={description} canonicalPath={`/${product.id}/price-in-${countrySlug}`} lang={lang}>
+  <div style="margin-bottom: 28px;">
+    <div style="margin-bottom: 12px;">
+      <a href={getLocalizedPath(`/${product.id}/pricing`, lang)} style="font-size: 0.88rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px;">
+        {t(lang, 'backToMatrix', { name: product.name })}
+      </a>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+      <span class="badge badge-category">{country.flag} {country.name}</span>
+      <span style="font-size: 0.82rem; color: #38bdf8;">Verified Regional Pricing</span>
+    </div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin: 6px 0;">
+      {t(lang, 'howMuchIn', { product: product.name, country: country.name })}
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 820px;">
+      Complete breakdown of subscription pricing, currency conversion rates, and purchasing power parity for {country.name}.
+    </p>
+  </div>
+
+  <!-- Main Hero Price Card -->
+  <div class="glass-card" style="background: var(--bg-surface); border: 1px solid var(--border-glass); border-left: 5px solid var(--primary); margin-bottom: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <span style="color: var(--text-dim); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
+          {t(lang, 'officialLocalPrice', { curr: country.currency })}
+        </span>
+        <div class="mono" style="font-size: 2.8rem; font-weight: 800; color: var(--primary); line-height: 1.1; margin: 8px 0;">
+          {formatCurrencyLocal(localPrice, country.currency)} <span style="font-size: 1.1rem; color: var(--text-dim); font-weight: 400;">/ month</span>
+        </div>
+        <div style="font-size: 1.2rem; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <span>≈</span>
+          <span class="mono" style="color: #34d399; font-size: 1.4rem; font-weight: 800;">${usdPrice.toFixed(2)} USD</span>
+          <span style="color: var(--text-dim); font-size: 0.85rem; font-weight: 400;">(live FX benchmark)</span>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        {diffPercent < 0 ? (
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 14px 20px; border-radius: 12px;">
+            <span style="font-size: 0.82rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">{t(lang, 'regionalSavings')}</span>
+            <div class="mono" style="font-size: 1.8rem; font-weight: 900; color: #34d399;">
+              {Math.abs(diffPercent)}% OFF
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-dim);">vs United States (${usItem.usdPrice}/mo)</span>
+          </div>
+        ) : diffPercent > 0 ? (
+          <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); padding: 14px 20px; border-radius: 12px;">
+            <span style="font-size: 0.82rem; color: #fecdd3; text-transform: uppercase; font-weight: 700;">{t(lang, 'pricePremium')}</span>
+            <div class="mono" style="font-size: 1.8rem; font-weight: 900; color: #fb7185;">
+              +{diffPercent}% HIGHER
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-dim);">vs United States (${usItem.usdPrice}/mo)</span>
+          </div>
+        ) : (
+          <div style="background: var(--card-bg-subtle); border: 1px solid var(--border-glass); padding: 14px 20px; border-radius: 12px;">
+            <span style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Baseline Rate</span>
+            <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">{t(lang, 'baseline0')}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Conversion Calculator Widget -->
+  <div class="glass-card" style="margin-bottom: 28px;">
+    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">
+      {t(lang, 'interactiveEstimator')}
+    </h3>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+      <div>
+        <label style="display: block; font-size: 0.82rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; text-transform: uppercase;">
+          {t(lang, 'subscriptionDuration')}
+        </label>
+        
+        <!-- Styled Custom Selectbox (Non-native) -->
+        <div class="custom-select-wrapper" id="customMonthsWrapper">
+          <div class="custom-select-trigger" id="customMonthsTrigger">
+            <span id="customMonthsLabel">{t(lang, 'months12')}</span>
+            <span style="font-size: 0.75rem; color: var(--primary);">▼</span>
+          </div>
+          <div class="custom-select-options">
+            <div class="custom-option" data-value="1">{t(lang, 'month1')}</div>
+            <div class="custom-option" data-value="3">{t(lang, 'months3')}</div>
+            <div class="custom-option" data-value="6">{t(lang, 'months6')}</div>
+            <div class="custom-option selected" data-value="12">{t(lang, 'months12')}</div>
+          </div>
+        </div>
+        <input type="hidden" id="monthsSelect" value="12" />
+      </div>
+
+      <div style="flex: 1; min-width: 260px; background: var(--card-bg-subtle); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-glass);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{t(lang, 'totalLocalCost')}</span>
+          <span class="mono" id="calcLocalTotal" style="font-weight: 700; color: var(--primary);">--</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="font-size: 0.85rem; color: var(--text-dim);">{t(lang, 'totalConvertedUsd')}</span>
+          <span class="mono" id="calcUsdTotal" style="font-weight: 700; color: #34d399;">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Value Insight Badge -->
+  <div class="glass-card" style="margin-bottom: 28px; background: var(--card-bg-subtle); border: 1px dashed var(--border-glass-hover);">
+    <div style="display: flex; gap: 14px; align-items: center;">
+      <span style="font-size: 1.8rem;">💡</span>
+      <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.5;">
+        <strong style="color: var(--text-primary);">{t(lang, 'buyerTip', { country: country.name })}</strong> 
+        {product.vpnFriendly 
+          ? `Subscriptions for ${product.name} typically accept international credit cards with standard currency conversion.` 
+          : `Important: ${product.name} enforces local bank card or regional payment checks in ${country.name}. Use a native billing method to avoid order cancellation.`}
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Accordion / Cards -->
+  <div class="glass-card" style="margin-bottom: 28px;">
+    <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">{t(lang, 'faqTitle')}</h2>
+    <div style="margin-bottom: 18px;">
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+        {t(lang, 'faqQ1', { product: product.name, country: country.name })}
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;">{product.paymentRestrictions}</p>
+    </div>
+    <div style="border-top: 1px solid var(--border-glass); padding-top: 16px;">
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+        {t(lang, 'faqQ2', { product: product.name })}
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;">
+        {t(lang, 'faqA2')}
+      </p>
+    </div>
+  </div>
+
+  <!-- Related Countries Grid -->
+  <div class="glass-card">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px;">{t(lang, 'compareOtherRegions', { product: product.name })}</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;">
+      {normalized.map((other) => (
+        <a
+          href={getLocalizedPath(`/${product.id}/price-in-${other.country.name.toLowerCase().replace(/\s+/g, '-')}`, lang)}
+          class="btn btn-ghost"
+          style="justify-content: space-between; font-size: 0.85rem; padding: 10px 14px;"
+        >
+          <span>{other.country.flag} {other.country.name}</span>
+          <span class="mono" style="color: #34d399; font-weight: 700;">${other.usdPrice}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ localPrice, usdPrice, currency: country.currency }}>
+    const hiddenInput = document.getElementById('monthsSelect');
+    const customWrapper = document.getElementById('customMonthsWrapper');
+    const customTrigger = document.getElementById('customMonthsTrigger');
+    const customLabel = document.getElementById('customMonthsLabel');
+    const customOptions = document.querySelectorAll('.custom-option');
+    const localTotalEl = document.getElementById('calcLocalTotal');
+    const usdTotalEl = document.getElementById('calcUsdTotal');
+
+    function updateCalc(months) {
+      const totalLocal = localPrice * months;
+      const totalUsd = usdPrice * months;
+
+      if (localTotalEl) localTotalEl.textContent = `${currency} ${totalLocal.toLocaleString()}`;
+      if (usdTotalEl) usdTotalEl.textContent = `$${totalUsd.toFixed(2)} USD`;
+    }
+
+    if (customTrigger && customWrapper) {
+      customTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customWrapper.classList.toggle('open');
+      });
+
+      document.addEventListener('click', () => {
+        customWrapper.classList.remove('open');
+      });
+
+      customOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+          customOptions.forEach((opt) => opt.classList.remove('selected'));
+          option.classList.add('selected');
+          const val = parseInt(option.dataset.value, 10);
+          if (customLabel) customLabel.textContent = option.textContent;
+          if (hiddenInput) hiddenInput.value = val;
+          updateCalc(val);
+          customWrapper.classList.remove('open');
+        });
+      });
+    }
+
+    // Initialize with 12 months default
+    updateCalc(12);
+  </script>
+</Layout>
