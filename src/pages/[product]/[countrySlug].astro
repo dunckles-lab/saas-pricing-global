@@ -68,7 +68,7 @@ const productSchema = {
       <span class="badge badge-category">{country.flag} {country.name}</span>
       <span style="font-size: 0.82rem; color: #38bdf8;">Verified Regional Pricing</span>
     </div>
-    <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; margin: 6px 0;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin: 6px 0;">
       How Much is {product.name} in {country.name}?
     </h1>
     <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 820px;">
@@ -77,16 +77,16 @@ const productSchema = {
   </div>
 
   <!-- Main Hero Price Card -->
-  <div class="glass-card" style="background: linear-gradient(135deg, rgba(14, 21, 38, 0.95), rgba(6, 9, 19, 0.95)); border: 1px solid var(--border-glass); border-left: 5px solid #38bdf8; margin-bottom: 28px;">
+  <div class="glass-card" style="background: var(--bg-surface); border: 1px solid var(--border-glass); border-left: 5px solid var(--primary); margin-bottom: 28px;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
       <div>
         <span style="color: var(--text-dim); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
           Official Local Price ({country.currency}):
         </span>
-        <div class="mono" style="font-size: 2.8rem; font-weight: 800; color: #38bdf8; line-height: 1.1; margin: 8px 0;">
+        <div class="mono" style="font-size: 2.8rem; font-weight: 800; color: var(--primary); line-height: 1.1; margin: 8px 0;">
           {formatCurrencyLocal(localPrice, country.currency)} <span style="font-size: 1.1rem; color: var(--text-dim); font-weight: 400;">/ month</span>
         </div>
-        <div style="font-size: 1.2rem; color: #f8fafc; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+        <div style="font-size: 1.2rem; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
           <span>≈</span>
           <span class="mono" style="color: #34d399; font-size: 1.4rem; font-weight: 800;">${usdPrice.toFixed(2)} USD</span>
           <span style="color: var(--text-dim); font-size: 0.85rem; font-weight: 400;">(live FX benchmark)</span>
@@ -111,9 +111,9 @@ const productSchema = {
             <span style="font-size: 0.8rem; color: var(--text-dim);">vs United States (${usItem.usdPrice}/mo)</span>
           </div>
         ) : (
-          <div style="background: rgba(255, 255, 255, 0.05); padding: 14px 20px; border-radius: 12px;">
+          <div style="background: var(--card-bg-subtle); border: 1px solid var(--border-glass); padding: 14px 20px; border-radius: 12px;">
             <span style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Baseline Rate</span>
-            <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: #ffffff;">Standard 0%</div>
+            <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Standard 0%</div>
           </div>
         )}
       </div>
@@ -122,7 +122,7 @@ const productSchema = {
 
   <!-- Interactive Conversion Calculator Widget -->
   <div class="glass-card" style="margin-bottom: 28px;">
-    <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 16px;">
+    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">
       Interactive Multi-Month Cost Estimator
     </h3>
     <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
@@ -148,10 +148,10 @@ const productSchema = {
         <input type="hidden" id="monthsSelect" value="12" />
       </div>
 
-      <div style="flex: 1; min-width: 260px; background: rgba(6, 9, 19, 0.6); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-glass);">
+      <div style="flex: 1; min-width: 260px; background: var(--card-bg-subtle); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-glass);">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
           <span style="font-size: 0.85rem; color: var(--text-dim);">Total Local Cost:</span>
-          <span class="mono" id="calcLocalTotal" style="font-weight: 700; color: #38bdf8;">--</span>
+          <span class="mono" id="calcLocalTotal" style="font-weight: 700; color: var(--primary);">--</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="font-size: 0.85rem; color: var(--text-dim);">Total Converted USD:</span>
@@ -162,11 +162,11 @@ const productSchema = {
   </div>
 
   <!-- Interactive Value Insight Badge -->
-  <div class="glass-card" style="margin-bottom: 28px; background: rgba(56, 189, 248, 0.05); border: 1px dashed rgba(56, 189, 248, 0.3);">
+  <div class="glass-card" style="margin-bottom: 28px; background: var(--card-bg-subtle); border: 1px dashed var(--border-glass-hover);">
     <div style="display: flex; gap: 14px; align-items: center;">
       <span style="font-size: 1.8rem;">💡</span>
       <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.5;">
-        <strong style="color: #fff;">Buyer Tip for {country.name}:</strong> 
+        <strong style="color: var(--text-primary);">Buyer Tip for {country.name}:</strong> 
         {product.vpnFriendly 
           ? `Subscriptions for ${product.name} typically accept international credit cards with standard currency conversion.` 
           : `Important: ${product.name} enforces local bank card or regional payment checks in ${country.name}. Use a native billing method to avoid order cancellation.`}
@@ -176,15 +176,15 @@ const productSchema = {
 
   <!-- FAQ Accordion / Cards -->
   <div class="glass-card" style="margin-bottom: 28px;">
-    <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 16px;">Frequently Asked Questions</h2>
+    <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">Frequently Asked Questions</h2>
     <div style="margin-bottom: 18px;">
-      <h3 style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 6px;">
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
         What payment methods work for {product.name} in {country.name}?
       </h3>
       <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;">{product.paymentRestrictions}</p>
     </div>
     <div style="border-top: 1px solid var(--border-glass); padding-top: 16px;">
-      <h3 style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 6px;">
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
         Why does {product.name} cost differently across countries?
       </h3>
       <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;">
@@ -195,7 +195,7 @@ const productSchema = {
 
   <!-- Related Countries Grid -->
   <div class="glass-card">
-    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 14px;">Compare {product.name} in Other Regions</h3>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px;">Compare {product.name} in Other Regions</h3>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;">
       {normalized.map((other) => (
         <a

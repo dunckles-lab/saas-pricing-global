@@ -28,7 +28,7 @@ const jsonLd = [
       <span class="badge badge-cheapest">📚 Masterclass & Explainer</span>
       <span style="font-size: 0.82rem; color: #38bdf8;">Purchasing Power Parity (PPP)</span>
     </div>
-    <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; margin: 8px 0;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin: 8px 0;">
       How Regional SaaS Pricing Works: The Definitive Guide
     </h1>
     <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 800px; line-height: 1.6;">
@@ -40,7 +40,7 @@ const jsonLd = [
     <div style="display: flex; flex-direction: column; gap: 28px;">
       <!-- Section 1 -->
       <section class="glass-card">
-        <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
           <span>⚖️</span> 1. What is Purchasing Power Parity (PPP)?
         </h2>
         <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 14px;">
@@ -53,22 +53,22 @@ const jsonLd = [
 
       <!-- Section 2 -->
       <section class="glass-card">
-        <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
           <span>🛡️</span> 2. Types of Regional Anti-Arbitrage Restrictions
         </h2>
         <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 14px;">
           SaaS providers prevent cross-border exploitation through three common barriers:
         </p>
         <ul style="color: var(--text-muted); line-height: 1.8; padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
-          <li><strong style="color: #f8fafc;">BIN Geo-Locking (Bank Identification Number):</strong> The payment gateway inspects the issuing country of your credit or debit card. If you attempt to checkout on the Turkish Spotify store with a US Visa card, the transaction fails automatically.</li>
-          <li><strong style="color: #f8fafc;">App Store / Play Store Regional Currency Ties:</strong> Services that bill through Google Play or Apple Subscriptions check your store country, which usually requires a localized payment method or region-specific gift card.</li>
-          <li><strong style="color: #f8fafc;">Household IP & Location Tracking:</strong> Streaming services (e.g., Netflix) monitor regular connection locations to detect whether the subscriber is physically residing in the registered country.</li>
+          <li><strong style="color: var(--text-primary);">BIN Geo-Locking (Bank Identification Number):</strong> The payment gateway inspects the issuing country of your credit or debit card. If you attempt to checkout on the Turkish Spotify store with a US Visa card, the transaction fails automatically.</li>
+          <li><strong style="color: var(--text-primary);">App Store / Play Store Regional Currency Ties:</strong> Services that bill through Google Play or Apple Subscriptions check your store country, which usually requires a localized payment method or region-specific gift card.</li>
+          <li><strong style="color: var(--text-primary);">Household IP & Location Tracking:</strong> Streaming services (e.g., Netflix) monitor regular connection locations to detect whether the subscriber is physically residing in the registered country.</li>
         </ul>
       </section>
 
       <!-- Section 3 -->
       <section class="glass-card">
-        <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
           <span>💳</span> 3. Legal and Terms of Service (ToS) Considerations
         </h2>
         <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 14px;">
@@ -82,8 +82,8 @@ const jsonLd = [
 
     <!-- Sidebar Sticky Box -->
     <div style="display: flex; flex-direction: column; gap: 20px;">
-      <div class="glass-card" style="background: rgba(14, 21, 38, 0.9); border: 1px solid rgba(56, 189, 248, 0.3);">
-        <h3 style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin-bottom: 12px;">📊 Key Insights</h3>
+      <div class="glass-card" style="background: var(--bg-surface); border: 1px solid var(--border-glass);">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">📊 Key Insights</h3>
         <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;">
           <div style="border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
             <div style="color: var(--text-dim); font-size: 0.78rem;">Highest Global Savings</div>
@@ -91,7 +91,7 @@ const jsonLd = [
           </div>
           <div style="border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
             <div style="color: var(--text-dim); font-size: 0.78rem;">Lowest Regional Markets</div>
-            <div style="color: #f8fafc; font-weight: 600;">Turkey (TRY), Nigeria (NGN), Argentina (ARS), India (INR)</div>
+            <div style="color: var(--text-primary); font-weight: 600;">Turkey (TRY), Nigeria (NGN), Argentina (ARS), India (INR)</div>
           </div>
           <div>
             <div style="color: var(--text-dim); font-size: 0.78rem;">Currency Fluctuation Factor</div>
@@ -100,8 +100,8 @@ const jsonLd = [
         </div>
       </div>
 
-      <div class="glass-card" style="text-align: center; padding: 24px;">
-        <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Explore Live Software Index</h4>
+      <div class="glass-card" style="text-align: center; padding: 24px; background: var(--bg-surface);">
+        <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Explore Live Software Index</h4>
         <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">See real-time rates across 12 SaaS platforms & 15+ countries.</p>
         <a href="/" class="btn-primary" style="display: block; text-decoration: none; text-align: center; padding: 10px 16px; font-size: 0.9rem;">Browse All Software</a>
       </div>
