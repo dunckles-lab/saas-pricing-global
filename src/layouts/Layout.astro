@@ -1,0 +1,119 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  jsonLd?: object[];
+}
+
+const { title, description, canonicalPath = '', jsonLd = [] } = Astro.props;
+const siteUrl = 'https://saas-pricing-global.pages.dev';
+const canonicalUrl = `${siteUrl}${canonicalPath}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph & Twitter -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- JSON-LD Structured Data -->
+    {jsonLd.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+
+    <style is:global>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #0b0f19;
+        color: #e2e8f0;
+        line-height: 1.6;
+        padding-bottom: 60px;
+      }
+      a { color: #60a5fa; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .container { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+      .header {
+        border-bottom: 1px solid #1e293b;
+        padding: 20px 0;
+        background-color: #0f172a;
+      }
+      .header-content { display: flex; justify-content: space-between; align-items: center; }
+      .logo { font-size: 1.25rem; font-weight: 700; color: #38bdf8; letter-spacing: -0.5px; }
+      .badge-tag {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #1e293b;
+        color: #94a3b8;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .card {
+        background: #131d31;
+        border: 1px solid #1e293b;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      .table-wrapper { overflow-x: auto; margin-top: 16px; }
+      table { width: 100%; border-collapse: collapse; text-align: left; }
+      th, td { padding: 12px 16px; border-bottom: 1px solid #1e293b; }
+      th { background-color: #0f172a; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; }
+      .cheapest-badge { background: #065f46; color: #34d399; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+      .expensive-badge { background: #831843; color: #f472b6; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+      .ad-box {
+        background: #0f172a;
+        border: 1px dashed #334155;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 24px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header-content">
+        <a href="/" class="logo">🌐 GlobalSaaSPricing</a>
+        <nav>
+          <a href="/" style="margin-right: 16px;">All Software</a>
+          <a href="/cheapest-country-to-buy-chatgpt-plus" style="margin-right: 16px;">Cheapest Countries</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container" style="margin-top: 32px;">
+      <div class="ad-box" data-ad-slot="AUTO">
+        <span>Sponsored Ad Placement / High-RPM SaaS Partner</span>
+      </div>
+
+      <slot />
+
+      <div class="ad-box" data-ad-slot="AUTO" style="margin-top: 40px;">
+        <span>Sponsored Ad Placement / VPN & Global Billing Tools</span>
+      </div>
+
+      <footer style="margin-top: 60px; padding-top: 24px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; font-size: 0.85rem;">
+        <p>© 2026 GlobalSaaSPricing. Real-time regional software subscription prices & purchasing power analysis.</p>
+        <p style="margin-top: 6px;">Prices are regularly synchronized from public pricing tables and converted using real-time foreign exchange rates.</p>
+      </footer>
+    </div>
+  </body>
+</html>

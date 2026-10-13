@@ -1,0 +1,120 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SAAS_PRODUCTS, type SaaSProduct } from '../../data/products';
+import { COUNTRIES, type CountryInfo } from '../../data/countries';
+import { calculateNormalizedPrices, formatCurrencyLocal } from '../../utils/pricing';
+
+export function getStaticPaths() {
+  const paths = [];
+
+  for (const product of SAAS_PRODUCTS) {
+    for (const country of Object.values(COUNTRIES)) {
+      const countrySlug = country.name.toLowerCase().replace(/\s+/g, '-');
+      paths.push({
+        params: {
+          product: product.id,
+          countrySlug: `price-in-${countrySlug}`,
+        },
+        props: { product, country },
+      });
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  product: SaaSProduct;
+  country: CountryInfo;
+}
+
+const { product, country } = Astro.props;
+const primaryPlan = product.plans[0];
+const normalized = calculateNormalizedPrices(primaryPlan);
+const currentItem = normalized.find((i) => i.country.code === country.code);
+const usItem = normalized.find((i) => i.country.code === 'us') || normalized[normalized.length - 1];
+
+const localPrice = currentItem ? currentItem.localPrice : 0;
+const usdPrice = currentItem ? currentItem.usdPrice : 0;
+const diffPercent = currentItem ? currentItem.differenceVsUSPercent : 0;
+
+const title = `${product.name} Price in ${country.name} (${country.currency} Conversion & Cost 2026)`;
+const description = `How much is ${product.name} in ${country.name}? Official local price is ${formatCurrencyLocal(localPrice, country.currency)} (~$${usdPrice.toFixed(2)} USD). See full pricing breakdown and savings vs US.`;
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": `${product.name} Subscription in ${country.name}`,
+  "description": description,
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": country.currency,
+    "price": localPrice,
+    "priceValidUntil": "2026-12-31",
+    "availability": "https://schema.org/InStock",
+    "url": `https://saas-pricing-global.pages.dev/${product.id}/price-in-${country.name.toLowerCase().replace(/\s+/g, '-')}`
+  }
+};
+---
+
+<Layout title={title} description={description} canonicalPath={`/${product.id}/price-in-${country.name.toLowerCase().replace(/\s+/g, '-')}`} jsonLd={[productSchema]}>
+  <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 8px;">
+      <a href={`/${product.id}/pricing`} style="font-size: 0.9rem; color: #64748b;">← Back to {product.name} Global Matrix</a>
+    </div>
+    <span class="badge-tag">{country.flag} {country.name} Regional Pricing</span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #f8fafc; margin: 8px 0;">
+      How Much is {product.name} in {country.name}?
+    </h1>
+    <p style="color: #94a3b8; font-size: 1.05rem;">
+      Complete breakdown of subscription pricing, currency conversion rates, and purchasing power parity for {country.name}.
+    </p>
+  </div>
+
+  <div class="card" style="background: #0f172a; border-left: 4px solid #38bdf8;">
+    <h2 style="font-size: 1.1rem; font-weight: 600; color: #94a3b8; margin-bottom: 8px;">Official Price in {country.name}:</h2>
+    <div style="font-size: 2.5rem; font-weight: 800; color: #38bdf8;">
+      {formatCurrencyLocal(localPrice, country.currency)} <span style="font-size: 1.2rem; color: #94a3b8; font-weight: 400;">/ month</span>
+    </div>
+    <div style="font-size: 1.1rem; color: #cbd5e1; margin-top: 6px;">
+      ≈ <strong>${usdPrice.toFixed(2)} USD</strong> (converted using live FX exchange rates)
+    </div>
+    <div style="margin-top: 12px; font-size: 0.95rem;">
+      {diffPercent < 0 ? (
+        <span style="color: #34d399; font-weight: 600;">🎉 {Math.abs(diffPercent)}% cheaper than the United States standard rate (${usItem.usdPrice}/mo)</span>
+      ) : diffPercent > 0 ? (
+        <span style="color: #f472b6; font-weight: 600;">⚠ {diffPercent}% more expensive than the United States standard rate (${usItem.usdPrice}/mo)</span>
+      ) : (
+        <span style="color: #94a3b8;">Matches standard United States baseline pricing.</span>
+      )}
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 12px;">Frequently Asked Questions</h2>
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-size: 1rem; font-weight: 600; color: #f8fafc;">What payment methods work for {product.name} in {country.name}?</h3>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 4px;">{product.paymentRestrictions}</p>
+    </div>
+    <div>
+      <h3 style="font-size: 1rem; font-weight: 600; color: #f8fafc;">Why does {product.name} cost differently across countries?</h3>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 4px;">
+        Companies implement Purchasing Power Parity (PPP) pricing to make software affordable for local markets based on local average income and currency strength.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;">Compare with Other Countries</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      {normalized.slice(0, 10).map((other) => (
+        <a
+          href={`/${product.id}/price-in-${other.country.name.toLowerCase().replace(/\s+/g, '-')}`}
+          style="background: #0f172a; border: 1px solid #1e293b; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem;"
+        >
+          {other.country.flag} {other.country.name} (${other.usdPrice})
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

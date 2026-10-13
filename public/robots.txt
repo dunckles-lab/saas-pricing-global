@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saas-pricing-global.pages.dev/sitemap.xml

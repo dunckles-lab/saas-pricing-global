@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { SAAS_PRODUCTS } from '../data/products';
+import { calculateNormalizedPrices, formatCurrencyLocal } from '../utils/pricing';
+
+const title = "Global SaaS & Software Pricing by Country (2026 Comparison)";
+const description = "Compare subscription prices for ChatGPT Plus, Spotify, Netflix, GitHub Copilot, Canva, and Notion across 15+ countries. Find the cheapest region.";
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Global SaaS Pricing",
+  "url": "https://saas-pricing-global.pages.dev/",
+  "description": description,
+};
+---
+
+<Layout title={title} description={description} canonicalPath="/" jsonLd={[websiteSchema]}>
+  <div style="margin-bottom: 32px;">
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #f8fafc; margin-bottom: 12px;">Global SaaS & Software Pricing Matrix</h1>
+    <p style="color: #94a3b8; font-size: 1.1rem; max-width: 780px;">
+      Discover how digital subscription prices vary across the world. Software companies adjust rates according to local purchasing power, creating massive price differences.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px;">
+    {SAAS_PRODUCTS.map((prod) => {
+      const primaryPlan = prod.plans[0];
+      const normalized = calculateNormalizedPrices(primaryPlan);
+      const cheapest = normalized[0];
+      const expensive = normalized[normalized.length - 1];
+
+      return (
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <span class="badge-tag">{prod.category}</span>
+              <span style="font-size: 0.8rem; color: #38bdf8;">{prod.vpnFriendly ? '✓ International Cards' : '⚠ Local Payment Strict'}</span>
+            </div>
+            <h2 style="font-size: 1.4rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">
+              <a href={`/${prod.id}/pricing`}>{prod.name}</a>
+            </h2>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 16px;">
+              {prod.description}
+            </p>
+          </div>
+
+          <div style="border-top: 1px solid #1e293b; padding-top: 14px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: #64748b;">Cheapest ({cheapest.country.name}):</span>
+              <span style="color: #34d399; font-weight: 700;">${cheapest.usdPrice.toFixed(2)}/mo</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span style="color: #64748b;">Most Expensive ({expensive.country.name}):</span>
+              <span style="color: #f472b6; font-weight: 700;">${expensive.usdPrice.toFixed(2)}/mo</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <a href={`/${prod.id}/pricing`} style="flex: 1; text-align: center; background: #2563eb; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                Full Country Table →
+              </a>
+              <a href={`/cheapest-country-to-buy-${prod.id}`} style="background: #1e293b; color: #94a3b8; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;">
+                Cheapest Guide
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</Layout>

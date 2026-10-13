@@ -1,0 +1,75 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { SAAS_PRODUCTS, type SaaSProduct } from '../data/products';
+import { calculateNormalizedPrices, formatCurrencyLocal } from '../utils/pricing';
+
+export function getStaticPaths() {
+  return SAAS_PRODUCTS.map((product) => ({
+    params: { slug: `cheapest-country-to-buy-${product.id}` },
+    props: { product },
+  }));
+}
+
+interface Props {
+  product: SaaSProduct;
+}
+
+const { product } = Astro.props;
+const primaryPlan = product.plans[0];
+const normalized = calculateNormalizedPrices(primaryPlan);
+const cheapest = normalized[0];
+const top5Cheapest = normalized.slice(0, 5);
+
+const title = `Cheapest Country to Buy ${product.name} (2026 Rankings & Savings)`;
+const description = `Which country has the cheapest ${product.name} subscription? ${cheapest.country.name} (${cheapest.country.flag}) ranks #1 at $${cheapest.usdPrice.toFixed(2)}/mo. See top 5 lowest-priced regions.`;
+---
+
+<Layout title={title} description={description} canonicalPath={`/cheapest-country-to-buy-${product.id}`}>
+  <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 8px;">
+      <a href={`/${product.id}/pricing`} style="font-size: 0.9rem; color: #64748b;">← Back to {product.name} Table</a>
+    </div>
+    <span class="cheapest-badge" style="font-size: 0.8rem; padding: 4px 10px;">🏆 Global Savings Ranking</span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #f8fafc; margin: 10px 0;">
+      Cheapest Country to Buy {product.name}
+    </h1>
+    <p style="color: #94a3b8; font-size: 1.05rem;">
+      We analyzed subscription rates across 15+ currencies to find the lowest price in the world for {product.name}.
+    </p>
+  </div>
+
+  <div class="card" style="background: #064e3b; border: 1px solid #059669; text-align: center; padding: 36px 20px;">
+    <span style="color: #a7f3d0; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Absolute #1 Lowest Price</span>
+    <div style="font-size: 2.8rem; font-weight: 900; color: #ffffff; margin: 10px 0;">
+      {cheapest.country.flag} {cheapest.country.name}
+    </div>
+    <div style="font-size: 1.8rem; font-weight: 700; color: #6ee7b7;">
+      ${cheapest.usdPrice.toFixed(2)} USD / month
+    </div>
+    <div style="color: #d1fae5; font-size: 0.95rem; margin-top: 6px;">
+      Local charge: {formatCurrencyLocal(cheapest.localPrice, cheapest.country.currency)} ({cheapest.differenceVsUSPercent}% cheaper than standard US pricing)
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 16px;">Top 5 Cheapest Countries for {product.name}</h2>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      {top5Cheapest.map((item, index) => (
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 14px 18px; border-radius: 8px; border: 1px solid #1e293b;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.2rem; font-weight: 800; color: #38bdf8; width: 24px;">#{index + 1}</span>
+            <span style="font-size: 1.3rem;">{item.country.flag}</span>
+            <div>
+              <div style="font-weight: 700; color: #f8fafc;">{item.country.name}</div>
+              <div style="font-size: 0.8rem; color: #64748b;">{formatCurrencyLocal(item.localPrice, item.country.currency)}</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 700; color: #34d399; font-size: 1.1rem;">${item.usdPrice.toFixed(2)}/mo</div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">{item.differenceVsUSPercent}% vs US</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</Layout>

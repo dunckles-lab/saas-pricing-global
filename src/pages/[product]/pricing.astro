@@ -1,0 +1,147 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SAAS_PRODUCTS, type SaaSProduct } from '../../data/products';
+import { calculateNormalizedPrices, formatCurrencyLocal } from '../../utils/pricing';
+
+export function getStaticPaths() {
+  return SAAS_PRODUCTS.map((product) => ({
+    params: { product: product.id },
+    props: { product },
+  }));
+}
+
+interface Props {
+  product: SaaSProduct;
+}
+
+const { product } = Astro.props;
+const primaryPlan = product.plans[0];
+const normalized = calculateNormalizedPrices(primaryPlan);
+const cheapest = normalized[0];
+const usRate = normalized.find((i) => i.country.code === 'us') || normalized[normalized.length - 1];
+
+const title = `${product.name} Pricing by Country (2026 Comparison Table)`;
+const description = `Compare ${product.name} subscription costs across 15+ countries. See local currencies converted to USD. The cheapest country is ${cheapest.country.name} at $${cheapest.usdPrice}/mo.`;
+
+const tableSchema = {
+  "@context": "https://schema.org",
+  "@type": "Table",
+  "about": `${product.name} Pricing`,
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Which country has the cheapest ${product.name}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${cheapest.country.name} (${cheapest.country.flag}) is currently the cheapest country for ${product.name} (${primaryPlan.planName}), priced at approximately $${cheapest.usdPrice.toFixed(2)} USD per month.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `Can I subscribe to ${product.name} with an international credit card?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": product.paymentRestrictions
+      }
+    }
+  ]
+};
+---
+
+<Layout title={title} description={description} canonicalPath={`/${product.id}/pricing`} jsonLd={[tableSchema, faqSchema]}>
+  <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 8px;">
+      <a href="/" style="font-size: 0.9rem; color: #64748b;">← Back to All Software</a>
+    </div>
+    <span class="badge-tag">{product.category}</span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #f8fafc; margin: 8px 0;">{product.name} Pricing by Country</h1>
+    <p style="color: #94a3b8; font-size: 1.05rem; max-width: 800px;">{product.description}</p>
+  </div>
+
+  <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; background: #0f172a;">
+    <div>
+      <span style="color: #64748b; font-size: 0.85rem;">Cheapest Region:</span>
+      <div style="font-size: 1.3rem; font-weight: 700; color: #34d399; margin-top: 4px;">
+        {cheapest.country.flag} {cheapest.country.name}
+      </div>
+      <span style="font-size: 0.9rem; color: #94a3b8;">${cheapest.usdPrice.toFixed(2)} USD/mo</span>
+    </div>
+    <div>
+      <span style="color: #64748b; font-size: 0.85rem;">US Baseline Price:</span>
+      <div style="font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin-top: 4px;">
+        ${usRate.usdPrice.toFixed(2)} USD/mo
+      </div>
+      <span style="font-size: 0.9rem; color: #94a3b8;">Standard Tier</span>
+    </div>
+    <div>
+      <span style="color: #64748b; font-size: 0.85rem;">Potential Savings:</span>
+      <div style="font-size: 1.3rem; font-weight: 700; color: #38bdf8; margin-top: 4px;">
+        Up to {Math.abs(cheapest.differenceVsUSPercent)}% OFF
+      </div>
+      <span style="font-size: 0.9rem; color: #94a3b8;">vs United States billing</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 12px;">{primaryPlan.planName} - Complete Country Comparison</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Country</th>
+            <th>Local Price</th>
+            <th>Equivalent USD</th>
+            <th>Difference vs US</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {normalized.map((item, index) => (
+            <tr>
+              <td style="color: #64748b; font-weight: 600;">#{index + 1}</td>
+              <td style="font-weight: 600;">
+                <span style="margin-right: 8px;">{item.country.flag}</span>
+                <a href={`/${product.id}/price-in-${item.country.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {item.country.name}
+                </a>
+              </td>
+              <td>{formatCurrencyLocal(item.localPrice, item.country.currency)}</td>
+              <td style="font-weight: 700; color: #f8fafc;">${item.usdPrice.toFixed(2)}</td>
+              <td>
+                {item.differenceVsUSPercent < 0 ? (
+                  <span class="cheapest-badge">{item.differenceVsUSPercent}% Cheaper</span>
+                ) : item.differenceVsUSPercent > 0 ? (
+                  <span class="expensive-badge">+{item.differenceVsUSPercent}% Higher</span>
+                ) : (
+                  <span style="color: #94a3b8; font-size: 0.85rem;">Baseline (0%)</span>
+                )}
+              </td>
+              <td>
+                <a href={`/${product.id}/price-in-${item.country.name.toLowerCase().replace(/\s+/g, '-')}`} style="font-size: 0.85rem;">
+                  View Guide →
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 12px;">Payment Requirements & Geo-Restrictions</h3>
+    <p style="color: #cbd5e1; margin-bottom: 12px;">{product.paymentRestrictions}</p>
+    <div style="background: #0f172a; padding: 16px; border-radius: 8px; border-left: 4px solid #38bdf8;">
+      <h4 style="font-size: 0.95rem; font-weight: 600; color: #38bdf8; margin-bottom: 4px;">Important Billing Advisory</h4>
+      <p style="color: #94a3b8; font-size: 0.88rem;">
+        Regional pricing is intended for residents of the specified country. Using a VPN to purchase services outside your resident country may violate the service provider's terms of service and could result in subscription cancellation.
+      </p>
+    </div>
+  </div>
+</Layout>
