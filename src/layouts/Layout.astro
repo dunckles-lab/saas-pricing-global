@@ -17,6 +17,15 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <!-- Prevent Light/Dark Mode Flash -->
+    <script is:inline>
+      (function() {
+        const t = localStorage.getItem('theme');
+        if (t === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -63,21 +72,21 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
       [data-theme="light"] {
         --bg-main: #f8fafc;
         --bg-surface: #ffffff;
-        --bg-glass: rgba(255, 255, 255, 0.85);
-        --border-glass: rgba(0, 0, 0, 0.08);
-        --border-glass-hover: rgba(2, 132, 199, 0.4);
+        --bg-glass: rgba(255, 255, 255, 0.95);
+        --border-glass: rgba(0, 0, 0, 0.1);
+        --border-glass-hover: rgba(2, 132, 199, 0.5);
         --primary: #0284c7;
-        --primary-glow: rgba(2, 132, 199, 0.2);
+        --primary-glow: rgba(2, 132, 199, 0.15);
         --accent: #4f46e5;
         --success: #059669;
         --success-glow: rgba(5, 150, 105, 0.15);
         --danger: #e11d48;
         --text-primary: #0f172a;
-        --text-muted: #475569;
+        --text-muted: #334155;
         --text-dim: #64748b;
-        --nav-bg: rgba(255, 255, 255, 0.85);
-        --card-bg-subtle: rgba(241, 245, 249, 0.8);
-        --table-row-hover: rgba(2, 132, 199, 0.06);
+        --nav-bg: rgba(255, 255, 255, 0.95);
+        --card-bg-subtle: #f1f5f9;
+        --table-row-hover: rgba(2, 132, 199, 0.08);
       }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -116,8 +125,17 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         color: var(--primary);
       }
 
-      table tr:hover {
-        background: var(--table-row-hover);
+      .table-row-item td {
+        padding: 14px 16px;
+      }
+      .table-row-item a {
+        color: var(--text-primary) !important;
+      }
+      .table-row-item a:hover {
+        color: var(--primary) !important;
+      }
+      .table-row-item .mono {
+        color: var(--text-primary);
       }
       .mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -397,8 +415,8 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
 
       /* Sponsored Banner Slot */
       .ad-banner {
-        background: linear-gradient(90deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
-        border: 1px dashed rgba(100, 116, 139, 0.4);
+        background: var(--card-bg-subtle);
+        border: 1px dashed var(--border-glass-hover);
         border-radius: 12px;
         padding: 14px;
         text-align: center;
@@ -409,6 +427,28 @@ const canonicalUrl = `${siteUrl}${canonicalPath}`;
         align-items: center;
         justify-content: center;
         gap: 10px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      /* Global Table Typography & Styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: var(--text-primary);
+      }
+      thead th {
+        color: var(--text-dim) !important;
+        border-bottom: 1px solid var(--border-glass);
+      }
+      tbody td {
+        border-bottom: 1px solid var(--border-glass);
+        color: var(--text-primary);
+      }
+      tbody tr {
+        transition: background-color 0.15s ease;
+      }
+      tbody tr:hover {
+        background: var(--table-row-hover);
       }
     </style>
   </head>

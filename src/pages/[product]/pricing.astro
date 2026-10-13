@@ -145,29 +145,29 @@ const faqSchema = {
     </div>
 
     <div class="table-container">
-      <table class="data-table" id="pricingTable">
+      <table class="data-table" id="pricingTable" style="width: 100%; border-collapse: collapse;">
         <thead>
-          <tr>
-            <th style="width: 70px;">Rank</th>
-            <th>Country / Region</th>
-            <th>Local Listed Price</th>
-            <th>Normalized USD</th>
-            <th>vs US Benchmark</th>
-            <th style="text-align: right;">Detailed Guide</th>
+          <tr style="border-bottom: 1px solid var(--border-glass);">
+            <th style="width: 70px; padding: 14px 16px; text-align: left; color: var(--text-dim);">Rank</th>
+            <th style="padding: 14px 16px; text-align: left; color: var(--text-dim);">Country / Region</th>
+            <th style="padding: 14px 16px; text-align: left; color: var(--text-dim);">Local Listed Price</th>
+            <th style="padding: 14px 16px; text-align: left; color: var(--text-dim);">Normalized USD</th>
+            <th style="padding: 14px 16px; text-align: left; color: var(--text-dim);">vs US Benchmark</th>
+            <th style="padding: 14px 16px; text-align: right; color: var(--text-dim);">Detailed Guide</th>
           </tr>
         </thead>
         <tbody>
           {normalized.map((item, index) => (
-            <tr class="table-row-item" data-cname={item.country.name.toLowerCase()}>
-              <td class="mono" style="color: var(--text-dim); font-weight: 700;">#{index + 1}</td>
-              <td style="font-weight: 700;">
+            <tr class="table-row-item" data-cname={item.country.name.toLowerCase()} style="border-bottom: 1px solid var(--border-glass);">
+              <td class="mono" style="padding: 14px 16px; color: var(--text-dim); font-weight: 700;">#{index + 1}</td>
+              <td style="padding: 14px 16px; font-weight: 700;">
                 <span style="margin-right: 8px; font-size: 1.1rem;">{item.country.flag}</span>
                 <a href={`/${product.id}/price-in-${item.country.name.toLowerCase().replace(/\s+/g, '-')}`} style="color: var(--text-primary);">
                   {item.country.name}
                 </a>
               </td>
-              <td class="mono" style="color: var(--text-muted);">{formatCurrencyLocal(item.localPrice, item.country.currency)}</td>
-              <td class="mono" style="font-weight: 800; color: var(--text-primary); font-size: 1rem;">${item.usdPrice.toFixed(2)}</td>
+              <td class="mono" style="padding: 14px 16px; color: var(--text-muted);">{formatCurrencyLocal(item.localPrice, item.country.currency)}</td>
+              <td class="mono" style="padding: 14px 16px; font-weight: 800; color: var(--text-primary); font-size: 1rem;">${item.usdPrice.toFixed(2)}</td>
               <td>
                 {item.differenceVsUSPercent < 0 ? (
                   <span class="badge badge-cheapest">{item.differenceVsUSPercent}% Cheaper</span>
