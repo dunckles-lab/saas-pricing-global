@@ -151,6 +151,19 @@ const productSchema = {
     </div>
   </div>
 
+  <!-- Interactive Value Insight Badge -->
+  <div class="glass-card" style="margin-bottom: 28px; background: rgba(56, 189, 248, 0.05); border: 1px dashed rgba(56, 189, 248, 0.3);">
+    <div style="display: flex; gap: 14px; align-items: center;">
+      <span style="font-size: 1.8rem;">💡</span>
+      <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.5;">
+        <strong style="color: #fff;">Buyer Tip for {country.name}:</strong> 
+        {product.vpnFriendly 
+          ? `Subscriptions for ${product.name} typically accept international credit cards with standard currency conversion.` 
+          : `Important: ${product.name} enforces local bank card or regional payment checks in ${country.name}. Use a native billing method to avoid order cancellation.`}
+      </div>
+    </div>
+  </div>
+
   <!-- FAQ Accordion / Cards -->
   <div class="glass-card" style="margin-bottom: 28px;">
     <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 16px;">Frequently Asked Questions</h2>
